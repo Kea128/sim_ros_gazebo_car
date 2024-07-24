@@ -1,0 +1,18 @@
+<launch>
+    <!-- 启动rviz -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find swim_bot)/config/show_robot.rviz" />
+
+    <!-- 机器人状态发布节点 -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+        <param name="publish_frequency" type="double" value="50.0" />
+        <!-- 将gazebo的关节信息发布到rviz实时显示 -->
+        <remap from="/joint_states" to="/swim_bot/joint_states" />
+    </node>
+
+    <!-- 关节状态发布节点 这里其实没用到-->
+    <!-- 这部分注释掉是因为gazebo已经发步了关节状态？ -->
+    <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
+        <param name="publish_frequency" type="double" value="50.0" />
+    </node>
+
+</launch>

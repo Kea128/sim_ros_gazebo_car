@@ -1,0 +1,197 @@
+<?xml version="1.0"?>
+
+<robot name="swim_bot"
+    xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <!-- 计算惯性矩阵xacro -->
+    <xacro:include filename="inertial.xacro"/>
+    <xacro:property name="pi" value="3.1415926"/>
+
+    <xacro:property name="base_link_mass" value="0.2"/>
+    <xacro:property name="base_link_length" value="0.3"/>
+    <xacro:property name="base_link_width" value="0.15"/>
+    <xacro:property name="base_link_height" value="0.025"/>
+
+    <xacro:property name="wheel_active_mass" value="0.1"/>
+    <xacro:property name="wheel_active_radius" value="0.12"/>
+    <xacro:property name="wheel_active_width" value="0.05"/>
+    <xacro:property name="wheel_position_biasY" value="${base_link_width/2 + wheel_active_width/2 + 0.005}"/>
+
+    <xacro:property name="wheel_passive_mass" value="0.1"/>
+    <xacro:property name="wheel_passive_radius" value="${(wheel_active_radius - base_link_height/2)/2}"/>
+    <xacro:property name="wheel_passive_position_biasZ" value="${wheel_active_radius/2+base_link_height/2}"/>
+
+    <!-- 
+    红色（Red）: (1, 0, 0)
+    绿色（Green）: (0, 1, 0)
+    蓝色（Blue）: (0, 0, 1)
+    黄色（Yellow）: (1, 1, 0) 或 (1, 0.843, 0)
+    黑色（Black）: (0, 0, 0)
+    白色（White）: (1, 1, 1)
+    青色（Cyan）: (0, 1, 1)
+    品红（Magenta）: (1, 0, 1)
+    灰色（Gray）: (0.5, 0.5, 0.5) 
+    -->
+    <!-- 色阶 -->
+    <material name="red">
+        <color rgba="1 0 0 1"/>
+    </material>
+    <material name="green">
+        <color rgba="0 1 0 1"/>
+    </material>
+    <material name="blue">
+        <color rgba="0 0 1 1"/>
+    </material>
+    <material name="yellow">
+        <color rgba="1 1 0 1"/>
+    </material>
+    <material name="cyan">
+        <color rgba="0 1 1 1"/>
+    </material>
+    <material name="white">
+        <color rgba="1 1 1 1"/>
+    </material>
+    <material name="black">
+        <color rgba="0 0 0 1"/>
+    </material>
+
+    <!-- 虚拟连杆 -->
+    <link name="dummy_link">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <material name="green"/>
+        </visual>
+    </link>
+    <gazebo reference = "dummy_link">
+        <material>Gazebo/Green</material>
+    </gazebo>
+
+    <!-- 车身 -->
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="${base_link_length} ${base_link_width} ${base_link_height}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${base_link_length} ${base_link_width} ${base_link_height}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="blue"/>
+        </collision>
+        <!-- <inertial>
+            <mass value="0.01"/>
+            <inertia ixx="0.001336" ixy="0.0" ixz="0.0" iyy="0.001336" iyz="0.0" izz="0.000005"/>
+        </inertial> -->
+        <!-- 调用惯性参数矩阵函数 -->
+        <xacro:Box_inertial_matrix m="${base_link_mass}" l="${base_link_length}" w="${base_link_width}" h="${base_link_height}"/>
+    </link>
+    <gazebo reference="base_link">
+        <material>Gazebo/Blue</material>
+    </gazebo>
+    <joint name="base2dummy" type="fixed">
+        <parent link="dummy_link"/>
+        <child link="base_link"/>
+        <origin xyz="0 0 ${wheel_active_radius}" rpy="0 0 0" />
+    </joint>
+
+    <!-- 主动轮 -->
+    <xacro:macro name="wheel_active" params = "posflag position">
+        <link name="wheel_active_${position}">
+            <visual>
+                <geometry>
+                    <cylinder radius="${wheel_active_radius}" length="${wheel_active_width}"/>
+                </geometry>
+                <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+                <material name="red"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder radius="${wheel_active_radius}" length="${wheel_active_width}"/>
+                </geometry>
+                <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+                <material name="red"/>
+            </collision>
+            <xacro:cylinder_inertial_matrix m="${wheel_active_mass}" r="${wheel_active_radius}" h="${wheel_active_width}"/>
+        </link>
+        <joint name="wheel_active_${position}_2_base_link" type="continuous">
+            <parent link="base_link"/>
+            <child link="wheel_active_${position}"/>
+            <origin xyz="${base_link_length/2} ${posflag * wheel_position_biasY} 0"/>
+            <axis xyz="0 1 0"/>
+        </joint>
+        <gazebo reference="wheel_active_${position}">
+            <mu1 value="200"/>
+            <mu2 value="100"/>
+            <material>Gazebo/Red</material>
+        </gazebo>
+        <transmission name="wheel_active_${position}_trans">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="wheel_active_${position}_2_base_link">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="wheel_active_${position}_motor">
+                <mechanicalReduction>1.0</mechanicalReduction>
+            </actuator>
+        </transmission>
+    </xacro:macro>
+    <!-- 调用函数 -->
+    <xacro:wheel_active posflag="1" position="left"/>
+    <xacro:wheel_active posflag="-1" position="right"/>
+
+    <!-- 从动轮 -->
+    <xacro:macro name="wheel_passive" params = "posflag position">
+        <link name="wheel_passive_${position}">
+            <visual>
+                <geometry>
+                    <sphere radius="${wheel_passive_radius}" />
+                </geometry>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <material name="yellow"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <sphere radius="${wheel_passive_radius}" />
+                </geometry>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <material name="yellow"/>
+            </collision>
+            <xacro:sphere_inertial_matrix m="${wheel_passive_mass}" r="${wheel_passive_radius}" />
+        </link>
+        <joint name="wheel_passive_${position}_2_base_link" type="continuous">
+            <parent link="base_link"/>
+            <child link="wheel_passive_${position}"/>
+            <origin xyz="${-base_link_length/2} ${posflag * wheel_position_biasY} ${-wheel_passive_position_biasZ}"/>
+            <axis xyz="1 1 0"/>
+        </joint>
+        <gazebo reference="wheel_passive_${position}">
+            <mu1 value="200"/>
+            <mu2 value="100"/>
+            <material>Gazebo/Yellow</material>
+        </gazebo>
+        <transmission name="wheel_passive_${position}_trans">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="wheel_passive_${position}_2_base_link">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="wheel_passive_${position}_motor">
+                <mechanicalReduction>1.0</mechanicalReduction>
+            </actuator>
+        </transmission>
+    </xacro:macro>
+    <!-- 调用函数 -->
+    <xacro:wheel_passive posflag="1" position="left"/>
+    <xacro:wheel_passive posflag="-1" position="right"/>
+
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/swim_bot</robotNamespace>
+        </plugin>
+    </gazebo>
+</robot>
+
