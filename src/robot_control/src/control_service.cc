@@ -4,24 +4,28 @@
 
 #define outputLimit 1
 
+control_algorithm::pid::PID velWheelLeftPID(0.01, 0.001, 0, outputLimit,
+                                            -outputLimit, 20);
+control_algorithm::pid::PID velWheelRightPID(0.01, 0.001, 0, outputLimit,
+                                             -outputLimit, 20);
+control_algorithm::pid::PID turnPID(0.015, 0.001, 0, outputLimit, -outputLimit,
+                                    20);
 bool pushTorque(custom_msgs::control_param::Request &req,
                 custom_msgs::control_param::Response &res) {
-  static control_algorithm::pid::PID velPID(0.01, 0.01, 0, outputLimit,
-                                            -outputLimit, 30);
-  static control_algorithm::pid::PID turnPID(0.01, 0.01, 0, outputLimit,
-                                             -outputLimit, 30);
-  double pwmBaseL = velPID.update(req.setLinearVel, req.wheelVelL);
-  double pwmBaseR = velPID.update(req.setLinearVel, req.wheelVelR);
+  ROS_INFO("***************LOOP**************");
+  double pwmBaseL = velWheelLeftPID.update(req.setLinearVel, req.wheelVelL);
+  double pwmBaseR = velWheelRightPID.update(req.setLinearVel, req.wheelVelR);
   double pwmturn = turnPID.update(req.setAngulaVel, req.imuYawVel);
 
-  // double pwmL = pwmBase - pwmturn;
-  // double pwmR = pwmBase + pwmturn;
-  double pwmL = pwmBaseL;
-  double pwmR = pwmBaseR;
+  double pwmL = pwmBaseL - pwmturn;
+  double pwmR = pwmBaseR + pwmturn;
+  // double pwmL = pwmBaseL;
+  // double pwmR = pwmBaseR;
 
   res.leftTorque = pwmL;
   res.rightTorque = pwmR;
   ROS_INFO("wheelVelL: %f, wheelVelR: %f", req.wheelVelL, req.wheelVelR);
+  ROS_INFO("imuYawVel: %f", req.imuYawVel);
   ROS_INFO("leftTorque: %f , rightTorque: %f", pwmL, pwmR);
   return true;
 }

@@ -1,11 +1,12 @@
 <launch>
     <!-- 设置参数 -->
-    <arg name="paused" default="true"/>
+    <arg name="paused" default="false"/>
     <arg name="use_sim_time" default="true"/>
     <arg name="gui" default="true"/>
     <arg name="headless" default="false"/>
     <arg name="debug" default="false"/>
     <arg name="model" default="$(find swim_bot)/urdf/init.xacro"/>
+
 
     <!-- 启动gazebo泳池环境 -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -16,6 +17,7 @@
         <arg name="use_sim_time" value="$(arg use_sim_time)"/>
         <arg name="headless" value="$(arg headless)"/>
     </include>
+
 
     <!-- 机器人文件加载 -->
     <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />

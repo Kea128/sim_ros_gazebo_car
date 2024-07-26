@@ -8,17 +8,17 @@
 
     <xacro:property name="pi" value="3.1415926"/>
 
-    <xacro:property name="base_link_mass" value="0.1"/>
+    <xacro:property name="base_link_mass" value="0.2"/>
     <xacro:property name="base_link_length" value="0.3"/>
     <xacro:property name="base_link_width" value="0.15"/>
     <xacro:property name="base_link_height" value="0.025"/>
 
-    <xacro:property name="wheel_active_mass" value="0.05"/>
+    <xacro:property name="wheel_active_mass" value="0.1"/>
     <xacro:property name="wheel_active_radius" value="0.12"/>
     <xacro:property name="wheel_active_width" value="0.05"/>
     <xacro:property name="wheel_position_biasY" value="${base_link_width/2 + wheel_active_width/2 + 0.005}"/>
 
-    <xacro:property name="wheel_passive_mass" value="0.05"/>
+    <xacro:property name="wheel_passive_mass" value="0.1"/>
     <xacro:property name="wheel_passive_radius" value="${(wheel_active_radius - base_link_height/2)/2}"/>
     <xacro:property name="wheel_passive_position_biasZ" value="${wheel_active_radius/2+base_link_height/2}"/>
 
@@ -123,12 +123,12 @@
         <joint name="wheel_active_${position}_2_base_link" type="continuous">
             <parent link="base_link"/>
             <child link="wheel_active_${position}"/>
-            <origin xyz="${base_link_length/2} ${posflag * wheel_position_biasY} 0"/>
+            <origin xyz="${-base_link_length/2} ${posflag * wheel_position_biasY} 0"/>
             <axis xyz="0 1 0"/>
         </joint>
         <gazebo reference="wheel_active_${position}">
             <mu1 value="200"/>
-            <mu2 value="100"/>
+            <mu2 value="200"/>
             <material>Gazebo/Red</material>
         </gazebo>
         <transmission name="wheel_active_${position}_trans">
@@ -167,12 +167,12 @@
         <joint name="wheel_passive_${position}_2_base_link" type="continuous">
             <parent link="base_link"/>
             <child link="wheel_passive_${position}"/>
-            <origin xyz="${-base_link_length/2} ${posflag * wheel_position_biasY} ${-wheel_passive_position_biasZ}"/>
+            <origin xyz="${base_link_length/2} ${posflag * wheel_position_biasY} ${-wheel_passive_position_biasZ}"/>
             <axis xyz="0 1 0"/>
         </joint>
         <gazebo reference="wheel_passive_${position}">
-            <mu1 value="0.5"/>
-            <mu2 value="0.1"/>
+            <mu1 value="0.05"/>
+            <mu2 value="0.025"/>
             <material>Gazebo/Yellow</material>
         </gazebo>
         <transmission name="wheel_passive_${position}_trans">

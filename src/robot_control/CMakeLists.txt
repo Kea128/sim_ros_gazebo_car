@@ -38,6 +38,8 @@ add_executable(sensor src/sensor.cc)
 
 add_executable(control_service src/control_service.cc)
 
+add_executable(control_keyboard src/control_keyboard.cc)
+
 # add_dependencies(sensor ${PROJECT_NAME}_gencpp)
 # add_dependencies(control_service ${PROJECT_NAME}_gencpp)
 target_link_libraries(sensor
@@ -45,5 +47,9 @@ target_link_libraries(sensor
 )
 
 target_link_libraries(control_service
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(control_keyboard
   ${catkin_LIBRARIES}
 )

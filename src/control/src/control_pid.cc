@@ -13,7 +13,6 @@ double PID::update(const double &setValue, const double &feedBack) {
   double derivative = error - prev_error_;  // 微分项
 
   double output = Kp_ * error + Ki_ * integral_ + Kd_ * derivative;
-  ROS_INFO("error: %f , integral: %f , output: %f", error, integral_, output);
 
   output = output > maxOutput_ ? maxOutput_ : output;  // 限制输出
   output = output < minOutput_ ? minOutput_ : output;

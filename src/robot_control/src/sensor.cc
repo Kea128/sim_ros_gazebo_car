@@ -2,6 +2,7 @@
 
 #include "control_pid.h"
 #include "custom_msgs/control_param.h"
+#include "geometry_msgs/Twist.h"
 #include "quaternion.h"
 #include "ros/ros.h"
 #include "sensor_msgs/Imu.h"
@@ -10,6 +11,9 @@
 
 float wheelVelL = 0;
 float wheelVelR = 0;
+float setAngulaVel = 0;
+float setLinearVel = 0;
+
 ros::ServiceClient client;
 ros::Publisher wheelLeftCmd;
 ros::Publisher wheelRightCmd;
@@ -19,6 +23,11 @@ void callback_jointstate(const sensor_msgs::JointState::ConstPtr jointState) {
     wheelVelL = jointState->velocity[0];  //左轮速度获取
     wheelVelR = jointState->velocity[1];  //右轮速度获取
   }
+}
+
+void callback_keyboard(const geometry_msgs::Twist::ConstPtr keyboard) {
+  setLinearVel = keyboard->linear.x;
+  setAngulaVel = keyboard->angular.z;
 }
 
 void callback_imu(const sensor_msgs::Imu::ConstPtr imu) {
@@ -36,8 +45,8 @@ void callback_imu(const sensor_msgs::Imu::ConstPtr imu) {
   pitch = eulerZYX[1];
   yaw = eulerZYX[0];
 
-  srv.request.setAngulaVel = 0;
-  srv.request.setLinearVel = 10;
+  srv.request.setAngulaVel = setAngulaVel;
+  srv.request.setLinearVel = setLinearVel;
   srv.request.wheelVelL = wheelVelL;
   srv.request.wheelVelR = wheelVelR;
   srv.request.imuYawVel = imu->angular_velocity.z;
@@ -73,6 +82,10 @@ int main(int argc, char *argv[]) {
   //创建关节速度订阅对象
   ros::Subscriber jointVelSub = nh.subscribe<sensor_msgs::JointState>(
       "/swim_bot/joint_states", 1, callback_jointstate);
+
+  //创建目标速度订阅对象
+  ros::Subscriber targetVelSub =
+      nh.subscribe<geometry_msgs::Twist>("/my_cmd_vel", 10, callback_keyboard);
 
   ros::Rate rate(0.05);
   while (ros::ok()) {

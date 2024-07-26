@@ -7,13 +7,13 @@ class PID {
  public:
   // 构造函数
   PID(double Kp, double Ki, double Kd, double maxOutput, double minOutput,
-      double integralLimit)
+      double integralLimit = 0)
       : Kp_(Kp),
         Ki_(Ki),
         Kd_(Kd),
         maxOutput_(maxOutput),
         minOutput_(minOutput),
-        integralLimit_(integralLimit = 0),
+        integralLimit_(integralLimit),
         integral_(0.0),
         prev_error_(0.0) {}
   // ~PID();
