@@ -9,8 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
-  INCLUDE_DIRS # include目录为空，因为头文件不在特定的子目录下
-  LIBRARIES quaternionlib
+  INCLUDE_DIRS include # include目录为空，因为头文件不在特定的子目录下
+  LIBRARIES quaternionLib
   CATKIN_DEPENDS roscpp std_msgs
 
   # DEPENDS system_lib
@@ -20,10 +20,10 @@ catkin_package(
 include_directories(${catkin_INCLUDE_DIRS})
 
 # 包的根目录 包含自定义头文件
-include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # 声明一个cpp库
-add_library(quaternionlib src/quaternion.cc)
+add_library(quaternionLib src/quaternion.cc)
 
 # 链接catkin库
-target_link_libraries(quaternionlib ${catkin_LIBRARIES})
+# target_link_libraries(quaternionlib ${catkin_LIBRARIES})

@@ -1,0 +1,9 @@
+<robot name="swim_bot"
+    xmlns:xacro="http://wiki.ros.org/xacro">
+    <!-- 惯性矩阵 -->
+    <xacro:include filename="inertial.xacro"/>
+    <!-- robot & control -->
+    <xacro:include filename="robot.xacro" />
+    <!-- imu -->
+    <xacro:include filename="imu.xacro" />
+</robot>

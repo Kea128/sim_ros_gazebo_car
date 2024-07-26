@@ -2,6 +2,7 @@
 #define _QUATERNION_H
 
 #include <array>
+#include <cmath>
 #include <string>
 
 namespace quaternion {
@@ -16,8 +17,26 @@ class Quaternion {
   ~Quaternion();  //析构函数
 
   /*
+   * @brief normalize a quaternion
+   * @param None
+   * @return normalized quaternion
+   * @note Noneros
+   */
+  inline void normalization() {
+    float norm = sqrt(std::pow(w_, 2) + std::pow(x_, 2) + std::pow(y_, 2) +
+                      std::pow(z_, 2));
+    this->w_ /= norm;
+    this->x_ /= norm;
+    this->y_ /= norm;
+    this->z_ /= norm;
+  }
+
+  /*
    * @brief set a new quaternion
-   * @param
+   * @param w
+   * @param x
+   * @param y
+   * @param z
    * @return None
    * @note None
    */
@@ -61,21 +80,6 @@ class Quaternion {
    * @note None
    */
   inline float getZ() const { return this->z_; }
-
-  /*
-   * @brief normalize a quaternion
-   * @param None
-   * @return normalized quaternion
-   * @note None
-   */
-  inline void normalization() {
-    float norm = sqrt(std::pow(w_, 2) + std::pow(x_, 2) + std::pow(y_, 2) +
-                      std::pow(z_, 2));
-    this->w_ /= norm;
-    this->x_ /= norm;
-    this->y_ /= norm;
-    this->z_ /= norm;
-  }
 
   std::array<std::array<float, 3>, 3> toRotationMatrix()
       const;  //四元数转旋转矩阵

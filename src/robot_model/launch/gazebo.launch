@@ -5,7 +5,7 @@
     <arg name="gui" default="true"/>
     <arg name="headless" default="false"/>
     <arg name="debug" default="false"/>
-    <arg name="model" default="$(find swim_bot)/urdf/robot.xacro"/>
+    <arg name="model" default="$(find swim_bot)/urdf/init.xacro"/>
 
     <!-- 启动gazebo泳池环境 -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">

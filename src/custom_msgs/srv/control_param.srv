@@ -1,0 +1,11 @@
+# sensor data
+float64 wheelVelL
+float64 wheelVelR
+float64 imuYawVel
+# set value
+float64 setLinearVel
+float64 setAngulaVel
+---
+# wheels torque
+float64 leftTorque
+float64 rightTorque
