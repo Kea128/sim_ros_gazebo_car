@@ -12,7 +12,7 @@ control_algorithm::pid::PID turnPID(0.015, 0.001, 0, outputLimit, -outputLimit,
                                     20);
 bool pushTorque(custom_msgs::control_param::Request &req,
                 custom_msgs::control_param::Response &res) {
-  ROS_INFO("***************LOOP**************");
+  // ROS_INFO("***************LOOP**************");
   double pwmBaseL = velWheelLeftPID.update(req.setLinearVel, req.wheelVelL);
   double pwmBaseR = velWheelRightPID.update(req.setLinearVel, req.wheelVelR);
   double pwmturn = turnPID.update(req.setAngulaVel, req.imuYawVel);
@@ -24,9 +24,9 @@ bool pushTorque(custom_msgs::control_param::Request &req,
 
   res.leftTorque = pwmL;
   res.rightTorque = pwmR;
-  ROS_INFO("wheelVelL: %f, wheelVelR: %f", req.wheelVelL, req.wheelVelR);
-  ROS_INFO("imuYawVel: %f", req.imuYawVel);
-  ROS_INFO("leftTorque: %f , rightTorque: %f", pwmL, pwmR);
+  // ROS_INFO("wheelVelL: %f, wheelVelR: %f", req.wheelVelL, req.wheelVelR);
+  // ROS_INFO("imuYawVel: %f", req.imuYawVel);
+  // ROS_INFO("leftTorque: %f , rightTorque: %f", pwmL, pwmR);
   return true;
 }
 
