@@ -2,13 +2,13 @@
 #include "custom_msgs/control_param.h"
 #include "ros/ros.h"
 
-#define outputLimit 1
+#define outputLimit 5
 
-control_algorithm::pid::PID velWheelLeftPID(0.01, 0.001, 0, outputLimit,
+control_algorithm::pid::PID velWheelLeftPID(0.05, 0.001, 0, outputLimit,
                                             -outputLimit, 20);
-control_algorithm::pid::PID velWheelRightPID(0.01, 0.001, 0, outputLimit,
+control_algorithm::pid::PID velWheelRightPID(0.05, 0.001, 0, outputLimit,
                                              -outputLimit, 20);
-control_algorithm::pid::PID turnPID(0.015, 0.001, 0, outputLimit, -outputLimit,
+control_algorithm::pid::PID turnPID(0.2, 0.002, 0, outputLimit, -outputLimit,
                                     20);
 bool pushTorque(custom_msgs::control_param::Request &req,
                 custom_msgs::control_param::Response &res) {

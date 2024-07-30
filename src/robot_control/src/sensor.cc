@@ -1,3 +1,6 @@
+#include <gflags/gflags.h>
+#include <glog/logging.h>
+
 #include <array>
 
 #include "control_pid.h"
@@ -8,6 +11,8 @@
 #include "sensor_msgs/Imu.h"
 #include "sensor_msgs/JointState.h"
 #include "std_msgs/Float64.h"
+
+DEFINE_string(log_path, "./log", "Log file path");
 
 float wheelVelL = 0;
 float wheelVelR = 0;
@@ -62,9 +67,15 @@ void callback_imu(const sensor_msgs::Imu::ConstPtr imu) {
 }
 
 int main(int argc, char *argv[]) {
+  // 解析命令行参数
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  // 初始化日志库
+  google::InitGoogleLogging(argv[0]);
+
   ros::init(argc, argv, "sensor");
   ros::NodeHandle nh;
 
+  // LOG(ERROR) << "Hello, World!";
   // 创建控制客户端<
   client = nh.serviceClient<custom_msgs::control_param>("PID_control");
   ros::service::waitForService("PID_control");
@@ -85,12 +96,12 @@ int main(int argc, char *argv[]) {
 
   //创建目标速度订阅对象
   ros::Subscriber targetVelSub =
-      nh.subscribe<geometry_msgs::Twist>("/my_cmd_vel", 10, callback_keyboard);
+      nh.subscribe<geometry_msgs::Twist>("/my_cmd_vel", 1, callback_keyboard);
 
-  ros::Rate rate(0.05);
+  ros::Rate rate(20);
   while (ros::ok()) {
     ros::spinOnce();
-    ros::Rate rate(0.01);
+    rate.sleep();
   }
   return 0;
 }

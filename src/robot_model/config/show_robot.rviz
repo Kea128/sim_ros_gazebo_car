@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /Axes1
+        - /TF1
         - /Imu1
       Splitter Ratio: 0.5
     Tree Height: 232
@@ -135,7 +136,7 @@ Visualization Manager:
         wheel_passive_right:
           Value: true
       Marker Alpha: 1
-      Marker Scale: 1
+      Marker Scale: 3
       Name: TF
       Show Arrows: true
       Show Axes: true
@@ -193,7 +194,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.9718396663665771
+      Distance: 5.977094650268555
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -230,4 +231,4 @@ Window Geometry:
     collapsed: false
   Width: 1257
   X: 614
-  Y: 506
+  Y: 469

@@ -2,5 +2,4 @@
     <node pkg="robot_control" type="control_service" name="control_service" output="screen"/>
     <node pkg="robot_control" type="sensor" name="sensor" output="screen"/>
     <node pkg="robot_control" type="control_keyboard" name="control_keyboard" output="screen"/>
-
 </launch>

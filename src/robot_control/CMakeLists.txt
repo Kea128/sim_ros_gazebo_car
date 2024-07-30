@@ -14,6 +14,12 @@ find_package(catkin REQUIRED COMPONENTS
   custom_msgs
 )
 
+# 查找 glog 库
+find_package(glog REQUIRED)
+
+# 查找 gflags 库
+find_package(gflags REQUIRED)
+
 catkin_package(
 
   # INCLUDE_DIRS include
@@ -44,12 +50,18 @@ add_executable(control_keyboard src/control_keyboard.cc)
 # add_dependencies(control_service ${PROJECT_NAME}_gencpp)
 target_link_libraries(sensor
   ${catkin_LIBRARIES}
+  glog::glog
+  gflags
 )
 
 target_link_libraries(control_service
   ${catkin_LIBRARIES}
+  glog::glog
+  gflags
 )
 
 target_link_libraries(control_keyboard
   ${catkin_LIBRARIES}
+  glog::glog
+  gflags
 )
