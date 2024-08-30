@@ -6,6 +6,7 @@
 #include "control_pid.h"
 #include "custom_msgs/control_param.h"
 #include "geometry_msgs/Twist.h"
+#include "nav_msgs/Odometry.h"
 #include "quaternion.h"
 #include "ros/ros.h"
 #include "sensor_msgs/Imu.h"
@@ -22,6 +23,11 @@ float setLinearVel = 0;
 ros::ServiceClient client;
 ros::Publisher wheelLeftCmd;
 ros::Publisher wheelRightCmd;
+ros::Publisher odomPub;
+
+void pub_odom(const sensor_msgs::Imu& imu);
+using publishOdomType = std::function<void(const sensor_msgs::Imu&)>;
+publishOdomType publishOdom = std::bind(&pub_odom, std::placeholders::_1);
 
 void callback_jointstate(const sensor_msgs::JointState::ConstPtr jointState) {
   if (jointState->velocity.size() > 0) {  // 检查消息中是否有速度信息
@@ -36,6 +42,7 @@ void callback_keyboard(const geometry_msgs::Twist::ConstPtr keyboard) {
 }
 
 void callback_imu(const sensor_msgs::Imu::ConstPtr imu) {
+  publishOdom(*imu);
   static quaternion::Quaternion quat;
   static std::array<float, 3> eulerZYX;
   static std::array<float, 3> eulerZYZ;
@@ -66,7 +73,20 @@ void callback_imu(const sensor_msgs::Imu::ConstPtr imu) {
   }
 }
 
-int main(int argc, char *argv[]) {
+void pub_odom(const sensor_msgs::Imu& imu) {
+  nav_msgs::Odometry odom;
+  odom.header.frame_id = "odom";
+  odom.header.seq = 0;
+  odom.header.stamp = ros::Time::now();
+
+  odom.pose.pose.orientation.x = imu.orientation.x;
+  odom.pose.pose.orientation.y = imu.orientation.y;
+  odom.pose.pose.orientation.z = imu.orientation.z;
+  odom.pose.pose.orientation.w = imu.orientation.w;
+  odomPub.publish(odom);
+}
+
+int main(int argc, char* argv[]) {
   // 解析命令行参数
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   // 初始化日志库
@@ -85,6 +105,7 @@ int main(int argc, char *argv[]) {
       "/swim_bot/wheel_left_effort_controller/command", 1);
   wheelRightCmd = nh.advertise<std_msgs::Float64>(
       "/swim_bot/wheel_right_effort_controller/command", 1);
+  odomPub = nh.advertise<nav_msgs::Odometry>("/hwa/odom", 1);
 
   // 创建IMU订阅对象
   ros::Subscriber imuSub =
@@ -98,10 +119,6 @@ int main(int argc, char *argv[]) {
   ros::Subscriber targetVelSub =
       nh.subscribe<geometry_msgs::Twist>("/my_cmd_vel", 1, callback_keyboard);
 
-  ros::Rate rate(20);
-  while (ros::ok()) {
-    ros::spinOnce();
-    rate.sleep();
-  }
+  ros::spin();
   return 0;
 }

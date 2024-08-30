@@ -6,6 +6,7 @@
     <!-- 计算惯性矩阵xacro -->
     <!-- <xacro:include filename="inertial.xacro"/> -->
 
+    <!-- 设置参数 -->
     <xacro:property name="pi" value="3.1415926"/>
 
     <xacro:property name="base_link_mass" value="0.2"/>
@@ -189,6 +190,7 @@
     <xacro:wheel_passive posflag="1" position="left"/>
     <xacro:wheel_passive posflag="-1" position="right"/>
 
+    <!-- imu (在gazebo和rviz中显示为绿色长方体) -->
     <link name="imu_link">
         <visual>
             <geometry>
@@ -212,9 +214,15 @@
     <joint name="imu2base" type="fixed">
         <parent link="base_link"/>
         <child link="imu_link"/>
+        <!-- 若要修改IMU摆放位姿，修改下面 xyz 和 rpy 参数 -->
+        <!-- xyz 为imu_link中心点相较于base_link中心点的三根轴上的偏移量 -->
+        <!-- rpy 为imu_link相较于base_link的姿态角 -->
+        <!-- 这里将 rpy 的 r 设置为 pi/2，表示将IMU绕 x 轴旋转 90° 摆放，以模拟上墙时的imu状态 -->
+        <!-- 由于 imu 以 rpy="${pi/2} 0 0" 的姿态摆放，需要让机器人 顺时针 沿墙运动，才是对上墙状态的正确模拟 -->
         <origin xyz="0 0 ${base_link_width/4 + base_link_height/2}" rpy="${pi/2} 0 0" />
     </joint>
 
+    <!-- ros control 插件 -->
     <gazebo>
         <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
             <robotNamespace>/swim_bot</robotNamespace>
